@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" pannable="true" prefHeight="400.0" style="-fx-background-color: -bg-color;" stylesheets="@../stylesheets/application.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+    <content>
+        <VBox maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="200.0" style="-fx-background-color: -bg-color; -fx-padding: 30;" stylesheets="@../stylesheets/application.css">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title-text" text="Dashboard">
+               <font>
+                  <Font size="36.0" />
+               </font>
+            </Text>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="muted-text" text="Tuesday, June 23, 2026">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin></Text>
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0" styleClass="card">
+                     <children>
+                        <StackPane prefWidth="200.0" />
+                        <VBox prefWidth="100.0" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0" styleClass="card">
+                     <children>
+                        <StackPane prefWidth="200.0" />
+                        <VBox prefWidth="100.0" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0" styleClass="card">
+                     <children>
+                        <StackPane prefWidth="200.0" />
+                        <VBox prefWidth="100.0" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+         </children></VBox>
+    </content>
+</ScrollPane>

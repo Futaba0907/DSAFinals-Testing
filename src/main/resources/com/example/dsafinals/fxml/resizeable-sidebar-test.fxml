@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.String?>
+<SplitPane dividerPositions="0.5" prefHeight="500.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/26"
+           xmlns:fx="http://javafx.com/fxml/1">
+    <items>
+        <VBox fx:id="sidebar" prefHeight="620.0" prefWidth="200.0" spacing="8.0"
+              style="-fx-background-color: #171717; -fx-border-width: 0 1px 0 0;" styleClass="border"
+              stylesheets="@../stylesheets/buttons.css">
+            <children>
+                <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Digital Journal">
+                    <font>
+                        <Font name="System Bold" size="24.0"/>
+                    </font>
+                    <VBox.margin>
+                        <Insets bottom="10.0"/>
+                    </VBox.margin>
+                </Text>
+                <Button fx:id="dashboardButton" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308"
+                        mnemonicParsing="false" stylesheets="@../stylesheets/buttons.css" text="Dashboard"
+                        textFill="WHITE">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                    <styleClass>
+                        <String fx:value="selected-button"/>
+                        <String fx:value="sidebar-button"/>
+                    </styleClass>
+                </Button>
+                <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        styleClass="sidebar-button" text="Journal" textFill="WHITE">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Button>
+                <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        styleClass="sidebar-button" text="Albums" textFill="WHITE">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Button>
+                <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        styleClass="sidebar-button" text="Photos" textFill="WHITE">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Button>
+                <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS"/>
+                <Button alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                        styleClass="sidebar-button" text="Settings" textFill="WHITE">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Button>
+            </children>
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="15.0" top="22.0"/>
+            </padding>
+        </VBox>
+        <BorderPane style="-fx-background-color: #0a0a0a;">
+            <top>
+                <BorderPane minHeight="-Infinity" prefWidth="760.0" BorderPane.alignment="CENTER">
+                    <top>
+                        <HBox maxWidth="1.7976931348623157E308" prefHeight="55.0" prefWidth="100.0"
+                              style="-fx-border-width: 0 0 1px 0;" styleClass="border" BorderPane.alignment="CENTER">
+                            <children>
+                                <Region prefHeight="20.0" prefWidth="200.0" HBox.hgrow="ALWAYS"/>
+                                <Button minWidth="-Infinity" mnemonicParsing="false" styleClass="primary-button"
+                                        stylesheets="@../stylesheets/buttons.css" text="+  New Entry">
+                                    <font>
+                                        <Font size="16.0"/>
+                                    </font>
+                                    <padding>
+                                        <Insets bottom="10.0" left="17.0" right="17.0" top="10.0"/>
+                                    </padding>
+                                    <HBox.margin>
+                                        <Insets right="20.0"/>
+                                    </HBox.margin>
+                                </Button>
+                            </children>
+                            <BorderPane.margin>
+                                <Insets top="15.0"/>
+                            </BorderPane.margin>
+                        </HBox>
+                    </top>
+                </BorderPane>
+            </top>
+            <center>
+                <StackPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+            </center>
+        </BorderPane>
+    </items>
+</SplitPane>

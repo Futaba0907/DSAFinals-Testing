@@ -1,0 +1,39 @@
+.primary-button {
+    -fx-background-color: #155dfc;
+    -fx-text-fill: white;
+    -fx-font-weight: 800;
+    -fx-font-size: 16;
+}
+
+.primary-button:hover {
+    -fx-background-color: #1447e6;
+}
+
+.sidebar-button {
+    -fx-padding: 12px 10px;
+    -fx-font-size: 17px;
+    -fx-background-color: transparent;
+    -fx-font-weight: 600;
+    -fx-icon-color: white;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #262626;
+}
+
+.selected-button {
+    /*-fx-background-color: #3d3d3d;*/
+    -fx-background-color: #155dfc;
+}
+
+
+.selected-button:hover {
+    -fx-background-color: #155dfc;
+}
+
+.transparent-button {
+    -fx-background-color: transparent;
+    -fx-icon-color: white;
+    -fx-fill: white;
+    -fx-icon-color: white;
+}

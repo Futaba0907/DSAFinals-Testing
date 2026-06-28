@@ -1,0 +1,130 @@
+.root {
+    -bg-color: #0a0a0a;
+    -primary-color: #155dfc;
+    -sidebar-color: #171717;
+
+    -primary-text: #fff;
+    -fx-font-family: "sans-serif";
+    -page-padding: 20;
+}
+
+.title-text {
+    -fx-font-size: 36;
+    -fx-font-weight: bold;
+    -fx-fill: -primary-text;
+}
+
+.text {
+    -fx-fill: -primary-text;
+}
+
+.muted-text {
+    -fx-fill: #93a1a1;
+}
+
+.card {
+    -fx-background-color: #262626;
+    -fx-background-radius: 12px;
+}
+
+.colored-icon-box {
+    -fx-background-color: #2ecc71; /* Green color */
+    -fx-background-radius: 10px; /* Smooth rounded box */
+    -fx-min-width: 50px;
+    -fx-min-height: 50px;
+    -fx-max-width: 50px;
+    -fx-max-height: 50px;
+    -fx-alignment: center;
+}
+
+.button {
+    -fx-padding: 10px 17px;
+    -fx-background-radius: 13px;
+}
+
+.border {
+    -fx-border-color: #262626;
+    -fx-border-style: solid;
+}
+
+.sidebar-icon {
+    -fx-icon-color: white;
+}
+
+.topbar-icon-disabled {
+    -fx-icon-color: #353535;
+    -fx-background-color: transparent;
+
+}
+
+.topbar-icon-available {
+    -fx-icon-color: #9e9e9e;
+    -fx-background-color: transparent;
+
+}
+
+.titleBar {
+    -fx-background-color: #070707;
+    -fx-text-fill: white;
+}
+
+.titleBar .text {
+    -fx-text-fill: white;
+}
+
+/*Colors*/
+.background {
+    -fx-background-color: -bg-color;
+}
+
+/* Style the main pane and inner viewport background */
+.scroll-pane {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+/* Style the empty corner square when both scrollbars are active */
+.scroll-pane > .corner {
+    -fx-background-color: -sidebar-color;
+}
+
+/* Base style for both horizontal and vertical scrollbars */
+.scroll-pane .scroll-bar {
+    -fx-background-color: -sidebar-color;
+}
+
+/* Style the track (background of the scrollbar) */
+.scroll-pane .scroll-bar:horizontal .track,
+.scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: -sidebar-color;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+/* Style the draggable thumb (handle) */
+.scroll-pane .scroll-bar:horizontal .thumb,
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #5a5a5a;
+    -fx-background-insets: 2;
+    -fx-background-radius: 4;
+}
+
+/* Change thumb color on mouse hover */
+.scroll-pane .scroll-bar:horizontal .thumb:hover,
+.scroll-pane .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #808080;
+}
+
+/* Hide or modify the increment/decrement arrow buttons */
+.scroll-pane .scroll-bar .increment-button,
+.scroll-pane .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 0 10 0 0; /* Adjust size or hide */
+}
+
+.scroll-pane .scroll-bar .increment-arrow,
+.scroll-pane .scroll-bar .decrement-arrow {
+    -fx-shape: " "; /* Empties out the default arrow graphics */
+    -fx-padding: 0;
+}
