@@ -11,164 +11,201 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class JournalController {
 
-    // ── List View ─────────────────────────────────
+    // Sidebar (entry list)
+    @FXML private TextField searchField;
+    @FXML private Button    newEntryButton;
     @FXML private ScrollPane listScrollPane;
-    @FXML private VBox       entryListContainer;
-    @FXML private StackPane  emptyState;
-    @FXML private Button     newEntryButton;
-    @FXML private ComboBox<String> sortComboBox;
+    @FXML private VBox      groupedListContainer;
+    @FXML private StackPane emptyState;
 
-    // ── Editor View ───────────────────────────────
+    // Detail / editor
+    @FXML private VBox      detailEmptyState;
     @FXML private ScrollPane editorScrollPane;
-    @FXML private Button     backButton;
-    @FXML private Button     saveButton;
-    @FXML private Button     deleteButton;
-    @FXML private TextField  titleField;
+    @FXML private Text      dateTimeText;
+    @FXML private Button    deleteButton;
+    @FXML private Button    saveButton;
+    @FXML private TextField titleField;
     @FXML private DatePicker datePicker;
-    @FXML private TextField  tagInputField;
-    @FXML private FlowPane   tagsFlowPane;
-    @FXML private TextArea   contentArea;
-    @FXML private FlowPane   photosFlowPane;
-    @FXML private Button     addPhotoButton;
+    @FXML private TextField tagInputField;
+    @FXML private FlowPane  tagsFlowPane;
+    @FXML private TextArea  contentArea;
+    @FXML private FlowPane  photosFlowPane;
+    @FXML private Button    addPhotoButton;
 
     private final DataStore store = DataStore.getInstance();
-    private JournalEntry currentEntry = null;   // null → creating new
+    private JournalEntry currentEntry = null;   // null → drafting a new, unsaved entry
     private final List<String> currentPhotoPaths = new ArrayList<>();
 
-    private static final DateTimeFormatter DATE_FMT =
-            DateTimeFormatter.ofPattern("MMMM d, yyyy");
+    private static final DateTimeFormatter MONTH_HEADER_FMT =
+            DateTimeFormatter.ofPattern("MMMM yyyy");
+    private static final DateTimeFormatter DETAIL_HEADER_FMT =
+            DateTimeFormatter.ofPattern("EEEE, MMM d, yyyy");
+    private static final DateTimeFormatter TIME_FMT =
+            DateTimeFormatter.ofPattern("h:mm a");
 
-    // ─────────────────────────────────────────────
-    // INIT
-    // ─────────────────────────────────────────────
+    // Button Functions
 
     @FXML
     public void initialize() {
-        sortComboBox.getItems().addAll(
-                "Date (Newest First)", "Date (Oldest First)", "Title (A-Z)");
-        sortComboBox.setValue("Date (Newest First)");
-        sortComboBox.setOnAction(e -> refreshEntryList());
-
         newEntryButton.setOnAction(e -> openEditor(null));
-        backButton.setOnAction(e -> showListView());
         saveButton.setOnAction(e -> handleSave());
         deleteButton.setOnAction(e -> handleDelete());
         addPhotoButton.setOnAction(e -> handleAddPhoto());
-        searchField.setOnKeyReleased(e -> handleSearch());
+        searchField.setOnKeyReleased(e -> refreshEntryList());
 
         tagInputField.setOnKeyPressed(e -> {
             if (e.getCode() == KeyCode.ENTER) addTagFromInput();
         });
 
         refreshEntryList();
-        showListView();
+        showEmptyDetail();
     }
 
-    // ─────────────────────────────────────────────
-    // ENTRY LIST
-    // ─────────────────────────────────────────────
+    // ENTRY LIST — grouped by month, newest first
 
     private void refreshEntryList() {
-        entryListContainer.getChildren().clear();
+        groupedListContainer.getChildren().clear();
 
-        List<JournalEntry> sorted = getSortedEntries();
+        String keyword = searchField.getText() == null ? "" : searchField.getText().trim();
+        List<JournalEntry> entries = keyword.isEmpty()
+                ? store.getEntriesSortedByDate()
+                : store.searchEntriesByKeyword(keyword);
+
+        // Sort newest first (by date, then by creation time within the same date)
+        List<JournalEntry> sorted = new ArrayList<>(entries);
+        sorted.sort((a, b) -> {
+            int byDate = b.getDate().compareTo(a.getDate());
+            if (byDate != 0) return byDate;
+            return Long.compare(createdMillis(b), createdMillis(a));
+        });
+
         boolean isEmpty = sorted.isEmpty();
         emptyState.setVisible(isEmpty);
         emptyState.setManaged(isEmpty);
 
+        YearMonth currentGroup = null;
         for (JournalEntry entry : sorted) {
-            entryListContainer.getChildren().add(buildEntryCard(entry));
+            YearMonth ym = YearMonth.from(entry.getDate());
+            if (!ym.equals(currentGroup)) {
+                currentGroup = ym;
+                groupedListContainer.getChildren().add(buildMonthHeader(ym));
+            }
+            groupedListContainer.getChildren().add(buildEntryRow(entry));
         }
     }
 
-    private List<JournalEntry> getSortedEntries() {
-        String sort = sortComboBox.getValue();
-        if (sort == null) return store.getEntriesSortedByDate();
-
-        return switch (sort) {
-            case "Date (Newest First)" -> {
-                List<JournalEntry> list = store.getEntriesSortedByDate();
-                java.util.Collections.reverse(list);
-                yield list;
-            }
-            case "Date (Oldest First)" -> store.getEntriesSortedByDate();
-            case "Title (A-Z)"         -> store.getEntriesSortedByTitle();
-            default                    -> store.getEntriesSortedByDate();
-        };
+    private Text buildMonthHeader(YearMonth ym) {
+        Text header = new Text(ym.format(MONTH_HEADER_FMT));
+        header.setFill(javafx.scene.paint.Color.web("#93a1a1"));
+        header.setFont(Font.font("System", FontWeight.BOLD, 13));
+        VBox.setMargin(header, new Insets(14, 18, 6, 18));
+        return header;
     }
 
-    private HBox buildEntryCard(JournalEntry entry) {
-        HBox card = new HBox(16);
-        card.getStyleClass().add("card");
-        card.setPadding(new Insets(18));
-        card.setStyle("-fx-background-color: #1e1e1e; -fx-background-radius: 12; -fx-cursor: hand;");
+    private HBox buildEntryRow(JournalEntry entry) {
+        boolean selected = currentEntry != null && currentEntry.getId().equals(entry.getId());
 
-        // Hover effect
-        card.setOnMouseEntered(e ->
-                card.setStyle("-fx-background-color: #2a2a2a; -fx-background-radius: 12; -fx-cursor: hand;"));
-        card.setOnMouseExited(e ->
-                card.setStyle("-fx-background-color: #1e1e1e; -fx-background-radius: 12; -fx-cursor: hand;"));
-        card.setOnMouseClicked(e -> openEditor(entry));
+        HBox row = new HBox(12);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(10, 18, 10, 18));
+        row.setStyle(rowStyle(selected));
+        row.setOnMouseEntered(e -> { if (!isSelected(entry)) row.setStyle(rowStyle(false, true)); });
+        row.setOnMouseExited(e -> row.setStyle(rowStyle(isSelected(entry))));
+        row.setOnMouseClicked(e -> openEditor(entry));
 
-        // Text column
-        VBox textCol = new VBox(6);
+        // Weekday + day of month badge
+        VBox dateBadge = new VBox(0);
+        dateBadge.setAlignment(Pos.CENTER);
+        dateBadge.setMinWidth(38);
+        Label weekday = new Label(entry.getDate().getDayOfWeek()
+                .getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase());
+        weekday.setStyle("-fx-text-fill: #93a1a1; -fx-font-size: 10px; -fx-font-weight: bold;");
+        Label dayNum = new Label(String.format("%02d", entry.getDate().getDayOfMonth()));
+        dayNum.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+        dateBadge.getChildren().addAll(weekday, dayNum);
+
+        // Title / snippet / time column
+        VBox textCol = new VBox(3);
         HBox.setHgrow(textCol, Priority.ALWAYS);
 
         String displayTitle = (entry.getTitle() == null || entry.getTitle().isBlank())
                 ? "Untitled" : entry.getTitle();
-
         Label title = new Label(displayTitle);
-        title.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
-
-        Label date = new Label(entry.getDate() != null ? entry.getDate().format(DATE_FMT) : "");
-        date.setStyle("-fx-text-fill: #93a1a1; -fx-font-size: 12px;");
+        title.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;");
+        title.setMaxWidth(Double.MAX_VALUE);
 
         String snippetText = entry.getContent() == null ? "" :
                 entry.getContent().replaceAll("\\s+", " ").trim();
-        if (snippetText.length() > 140) snippetText = snippetText.substring(0, 140) + "…";
+        if (snippetText.length() > 70) snippetText = snippetText.substring(0, 70) + "…";
         Label snippet = new Label(snippetText);
-        snippet.setStyle("-fx-text-fill: #93a1a1; -fx-font-size: 13px;");
+        snippet.setStyle("-fx-text-fill: #93a1a1; -fx-font-size: 12px;");
         snippet.setWrapText(true);
-        snippet.setMaxWidth(560);
+        snippet.setMaxWidth(190);
 
-        // Tag chips
-        FlowPane tagsRow = new FlowPane(6, 4);
-        for (String tag : entry.getTags()) {
-            tagsRow.getChildren().add(buildTagChip(tag, null));
+        Label time = new Label(createdDateTime(entry).format(TIME_FMT));
+        time.setStyle("-fx-text-fill: #555; -fx-font-size: 11px;");
+
+        textCol.getChildren().addAll(title, snippet, time);
+
+        row.getChildren().addAll(dateBadge, textCol);
+
+        // Thumbnail, if this entry has photos attached
+        if (!entry.getPhotoPaths().isEmpty()) {
+            ImageView thumb = new ImageView();
+            thumb.setFitWidth(46);
+            thumb.setFitHeight(46);
+            thumb.setPreserveRatio(false);
+            thumb.setSmooth(true);
+            try {
+                File f = new File(entry.getPhotoPaths().get(0));
+                if (f.exists()) thumb.setImage(new Image(f.toURI().toString(), 46, 46, false, true, true));
+            } catch (Exception ignored) {}
+
+            StackPane thumbHolder = new StackPane(thumb);
+            thumbHolder.setStyle("-fx-background-color: #262626; -fx-background-radius: 8;");
+            thumbHolder.setPrefSize(46, 46);
+            thumbHolder.setMaxSize(46, 46);
+            row.getChildren().add(thumbHolder);
         }
 
-        textCol.getChildren().addAll(title, date, snippet, tagsRow);
-
-        // Meta column (photo count)
-        VBox metaCol = new VBox();
-        metaCol.setAlignment(Pos.TOP_RIGHT);
-        int photoCount = entry.getPhotoPaths().size();
-        if (photoCount > 0) {
-            Label photoLbl = new Label("📷 " + photoCount);
-            photoLbl.setStyle("-fx-text-fill: #93a1a1; -fx-font-size: 12px;");
-            metaCol.getChildren().add(photoLbl);
-        }
-
-        card.getChildren().addAll(textCol, metaCol);
-        return card;
+        return row;
     }
 
-    // ─────────────────────────────────────────────
-    // EDITOR
-    // ─────────────────────────────────────────────
+    private boolean isSelected(JournalEntry entry) {
+        return currentEntry != null && currentEntry.getId().equals(entry.getId());
+    }
+
+    private String rowStyle(boolean selected) {
+        return rowStyle(selected, false);
+    }
+
+    private String rowStyle(boolean selected, boolean hover) {
+        String bg = selected ? "#1447e6" : (hover ? "#232323" : "transparent");
+        return "-fx-background-color: " + bg + "; -fx-background-radius: 10; -fx-cursor: hand;";
+    }
+
+
+    // DETAILS/EDITOR
+
 
     public void openEditor(JournalEntry entry) {
         currentEntry = entry;
@@ -179,12 +216,15 @@ public class JournalController {
             datePicker.setValue(entry.getDate() != null ? entry.getDate() : LocalDate.now());
             contentArea.setText(entry.getContent());
             currentPhotoPaths.addAll(entry.getPhotoPaths());
+            dateTimeText.setText(formatHeaderDateTime(entry));
             deleteButton.setVisible(true);
             deleteButton.setManaged(true);
         } else {
             titleField.setText("");
             datePicker.setValue(LocalDate.now());
             contentArea.setText("");
+            dateTimeText.setText(LocalDateTime.now().format(DETAIL_HEADER_FMT) +
+                    " at " + LocalDateTime.now().format(TIME_FMT));
             deleteButton.setVisible(false);
             deleteButton.setManaged(false);
         }
@@ -192,8 +232,22 @@ public class JournalController {
         tagInputField.setText("");
         renderTagsEditor();
         renderPhotosEditor();
-        showEditorView();
+        showEditorPane();
+        refreshEntryList();
         titleField.requestFocus();
+    }
+
+    // Used by external callers to jump straight to an entry.
+    public void openEntry(JournalEntry entry) {
+        openEditor(entry);
+    }
+
+    private String formatHeaderDateTime(JournalEntry entry) {
+        String datePart = entry.getDate() != null
+                ? entry.getDate().format(DETAIL_HEADER_FMT)
+                : "";
+        String timePart = createdDateTime(entry).format(TIME_FMT);
+        return datePart + " at " + timePart;
     }
 
     private void renderTagsEditor() {
@@ -216,9 +270,6 @@ public class JournalController {
         if (!text.isEmpty()) {
             if (currentEntry != null) {
                 currentEntry.addTag(text);
-            } else {
-                // new entry not yet created — stash in a temp list until save
-                // handled via tempTags below
             }
             tagInputField.setText("");
             renderTagsEditor();
@@ -264,9 +315,7 @@ public class JournalController {
         return container;
     }
 
-    // ─────────────────────────────────────────────
     // SAVE / DELETE / ADD PHOTO
-    // ─────────────────────────────────────────────
 
     private void handleSave() {
         String title   = titleField.getText() == null ? "" : titleField.getText().trim();
@@ -278,30 +327,30 @@ public class JournalController {
             titleField.setText(title);
         }
 
+        String pendingTag = tagInputField.getText() == null ? "" : tagInputField.getText().trim();
+
         if (currentEntry == null) {
-            // New entry
             JournalEntry newEntry = new JournalEntry(title, content, date);
-            // Flush any tags typed in the input that haven't been "entered" yet
-            String pendingTag = tagInputField.getText() == null ? "" : tagInputField.getText().trim();
             if (!pendingTag.isEmpty()) newEntry.addTag(pendingTag);
             for (String path : currentPhotoPaths) newEntry.addPhoto(path);
             store.addEntry(newEntry);
+            currentEntry = newEntry;
         } else {
-            // Update existing
             currentEntry.setTitle(title);
             currentEntry.setContent(content);
             currentEntry.setDate(date);
-            // Flush any pending tag
-            String pendingTag = tagInputField.getText() == null ? "" : tagInputField.getText().trim();
             if (!pendingTag.isEmpty()) currentEntry.addTag(pendingTag);
-            // Sync photo paths
             currentEntry.getPhotoPaths().clear();
             for (String path : currentPhotoPaths) currentEntry.addPhoto(path);
             store.updateEntry(currentEntry);
         }
 
+        tagInputField.setText("");
+        dateTimeText.setText(formatHeaderDateTime(currentEntry));
+        deleteButton.setVisible(true);
+        deleteButton.setManaged(true);
+        renderTagsEditor();
         refreshEntryList();
-        showListView();
     }
 
     private void handleDelete() {
@@ -316,8 +365,9 @@ public class JournalController {
         confirm.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
                 store.deleteEntry(currentEntry.getId());
+                currentEntry = null;
                 refreshEntryList();
-                showListView();
+                showEmptyDetail();
             }
         });
     }
@@ -333,7 +383,6 @@ public class JournalController {
         if (files == null || files.isEmpty()) return;
 
         for (File file : files) {
-            // Import into managed storage (copies the file, registers it in DataStore)
             Photo imported = store.importPhoto(file.getAbsolutePath(), LocalDate.now());
             if (imported != null) {
                 currentPhotoPaths.add(imported.getFilePath());
@@ -342,55 +391,39 @@ public class JournalController {
         renderPhotosEditor();
     }
 
-    // ─────────────────────────────────────────────
-    // SEARCH
-    // ─────────────────────────────────────────────
-
-    // Called from FXML onKeyReleased if you want live search (optional hookup)
-    @FXML
-    private TextField searchField;
-
-    private void handleSearch() {
-        String keyword = searchField == null ? "" :
-                (searchField.getText() == null ? "" : searchField.getText().trim());
-        entryListContainer.getChildren().clear();
-
-        List<JournalEntry> results = keyword.isEmpty()
-                ? getSortedEntries()
-                : store.searchEntriesByKeyword(keyword);
-
-        emptyState.setVisible(results.isEmpty());
-        emptyState.setManaged(results.isEmpty());
-
-        for (JournalEntry e : results) {
-            entryListContainer.getChildren().add(buildEntryCard(e));
-        }
-    }
-
-    // ─────────────────────────────────────────────
     // VIEW SWITCHING
-    // ─────────────────────────────────────────────
 
-    private void showListView() {
-        currentEntry = null;
-        listScrollPane.setVisible(true);
-        listScrollPane.setManaged(true);
+    private void showEmptyDetail() {
+        detailEmptyState.setVisible(true);
+        detailEmptyState.setManaged(true);
         editorScrollPane.setVisible(false);
         editorScrollPane.setManaged(false);
     }
 
-    private void showEditorView() {
-        listScrollPane.setVisible(false);
-        listScrollPane.setManaged(false);
+    private void showEditorPane() {
+        detailEmptyState.setVisible(false);
+        detailEmptyState.setManaged(false);
         editorScrollPane.setVisible(true);
         editorScrollPane.setManaged(true);
     }
 
-    // ─────────────────────────────────────────────
     // HELPERS
-    // ─────────────────────────────────────────────
 
-    /** Tag chip. onRemove may be null (read-only chip on entry cards). */
+    // Entries store only their creation instant in their ID, reuse it to show a time-of-day.
+    private long createdMillis(JournalEntry entry) {
+        try {
+            return Long.parseLong(entry.getId());
+        } catch (Exception e) {
+            return 0L;
+        }
+    }
+
+    private LocalDateTime createdDateTime(JournalEntry entry) {
+        long millis = createdMillis(entry);
+        if (millis <= 0L) return entry.getDate() != null ? entry.getDate().atStartOfDay() : LocalDateTime.now();
+        return LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault());
+    }
+
     private HBox buildTagChip(String tag, Runnable onRemove) {
         HBox chip = new HBox(4);
         chip.setAlignment(Pos.CENTER);
@@ -409,21 +442,6 @@ public class JournalController {
             chip.getChildren().add(removeBtn);
         }
         return chip;
-    }
-
-    private Label styledLabel(String text) {
-        Label l = new Label(text);
-        l.setStyle("-fx-text-fill: #93a1a1; -fx-font-size: 12px;");
-        return l;
-    }
-
-    private TextField styledTextField(String value) {
-        TextField tf = new TextField(value == null ? "" : value);
-        tf.setStyle("-fx-background-color: #262626; -fx-text-fill: white; " +
-                    "-fx-prompt-text-fill: #555; -fx-border-color: #333; " +
-                    "-fx-border-radius: 6; -fx-background-radius: 6;");
-        tf.setPrefWidth(380);
-        return tf;
     }
 
     private void styleDialog(DialogPane pane) {

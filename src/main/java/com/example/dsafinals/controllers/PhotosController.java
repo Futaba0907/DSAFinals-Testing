@@ -25,12 +25,15 @@ public class PhotosController {
     @FXML private TextField  searchField;
     @FXML private Text       photoCountText;
     @FXML private StackPane  emptyState;
-    @FXML private DatePicker fromDatePicker;
-    @FXML private DatePicker toDatePicker;
+    @FXML private TextField  fromDateField;
+    @FXML private TextField  toDateField;
     @FXML private Button     filterButton;
     @FXML private Button     clearFilterButton;
 
     private final DataStore store = DataStore.getInstance();
+
+    private static final java.time.format.DateTimeFormatter DATE_INPUT_FMT =
+            java.time.format.DateTimeFormatter.ISO_LOCAL_DATE; // expects YYYY-MM-DD
 
     @FXML
     public void initialize() {
@@ -41,8 +44,10 @@ public class PhotosController {
 
         filterButton.setOnAction(e -> refreshGrid());
         clearFilterButton.setOnAction(e -> {
-            fromDatePicker.setValue(null);
-            toDatePicker.setValue(null);
+            fromDateField.setText("");
+            toDateField.setText("");
+            resetFieldStyle(fromDateField);
+            resetFieldStyle(toDateField);
             searchField.setText("");
             refreshGrid();
         });
@@ -52,9 +57,7 @@ public class PhotosController {
         refreshGrid();
     }
 
-    // ─────────────────────────────────────────────
     // GRID
-    // ─────────────────────────────────────────────
 
     private void refreshGrid() {
         photoGrid.getChildren().clear();
@@ -77,8 +80,8 @@ public class PhotosController {
         List<Photo> photos;
 
         // Date range filter
-        LocalDate from = fromDatePicker.getValue();
-        LocalDate to   = toDatePicker.getValue();
+        LocalDate from = parseDateField(fromDateField);
+        LocalDate to   = parseDateField(toDateField);
 
         if (from != null && to != null) {
             photos = store.getPhotosInRange(from, to);
@@ -150,9 +153,7 @@ public class PhotosController {
         return card;
     }
 
-    // ─────────────────────────────────────────────
     // PHOTO DETAIL DIALOG
-    // ─────────────────────────────────────────────
 
     private void openPhotoDetail(Photo photo) {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -229,12 +230,35 @@ public class PhotosController {
         });
     }
 
-    // ─────────────────────────────────────────────
-    // HELPERS
-    // ─────────────────────────────────────────────
+    // Truncate text
 
     private String truncate(String text, int maxLen) {
         return text.length() > maxLen ? text.substring(0, maxLen - 1) + "…" : text;
+    }
+
+    // Date Filter (check if valid date)
+    private LocalDate parseDateField(TextField field) {
+        String text = field.getText() == null ? "" : field.getText().trim();
+        if (text.isEmpty()) {
+            resetFieldStyle(field);
+            return null;
+        }
+        try {
+            LocalDate date = LocalDate.parse(text, DATE_INPUT_FMT);
+            resetFieldStyle(field);
+            return date;
+        } catch (Exception e) {
+            field.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white; " +
+                           "-fx-prompt-text-fill: #555; -fx-border-color: #ef4444; " +
+                           "-fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8 12;");
+            return null;
+        }
+    }
+
+    private void resetFieldStyle(TextField field) {
+        field.setStyle("-fx-background-color: #1e1e1e; -fx-text-fill: white; " +
+                       "-fx-prompt-text-fill: #555; -fx-border-color: #333; " +
+                       "-fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 8 12;");
     }
 
     private Label styledLabel(String text) {

@@ -61,7 +61,10 @@ public class MainController {
         redoButton.setGraphic(createIcon("mdi2r-redo", "topbar-icon-disabled"));
 
         // Change the view when a button is pressed
-        bindSidebarButton(dashboardButton, "dashboard.fxml");
+        dashboardButton.setOnAction(e -> {
+            selectButton(dashboardButton);
+            openDashboard();
+        });
         newEntryButton.setOnAction(e -> {
             selectButton(journalButton);
             JournalController controller = (JournalController) loadPageAndGetController("journal.fxml");
@@ -78,7 +81,20 @@ public class MainController {
                 sidebar.prefWidthProperty().bind(newScene.widthProperty().multiply(0.17));
             }
         });
-        loadPage("dashboard.fxml");
+        openDashboard();
+    }
+
+    /** Loads the Dashboard and wires its entry cards so clicking one jumps to the Journal page. */
+    private void openDashboard() {
+        DashboardController controller = (DashboardController) loadPageAndGetController("dashboard.fxml");
+        if (controller != null) {
+            controller.setEntryClickHandler(entry -> {
+                selectButton(journalButton);
+                JournalController journalController =
+                        (JournalController) loadPageAndGetController("journal.fxml");
+                if (journalController != null) journalController.openEntry(entry);
+            });
+        }
     }
 
     private Object loadPageAndGetController(String fxml) {

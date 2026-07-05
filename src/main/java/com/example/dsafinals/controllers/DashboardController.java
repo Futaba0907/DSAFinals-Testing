@@ -40,6 +40,13 @@ public class DashboardController {
 
     private final DataStore store = DataStore.getInstance();
 
+    /** Set by MainController so entry cards can navigate to the Journal page. */
+    private java.util.function.Consumer<JournalEntry> entryClickHandler;
+
+    public void setEntryClickHandler(java.util.function.Consumer<JournalEntry> handler) {
+        this.entryClickHandler = handler;
+    }
+
     private static final DateTimeFormatter DATE_FMT =
             DateTimeFormatter.ofPattern("MMMM d, yyyy");
 
@@ -59,9 +66,7 @@ public class DashboardController {
         refreshRecentEntries();
     }
 
-    // ─────────────────────────────────────────────
     // STATS CARDS
-    // ─────────────────────────────────────────────
 
     private void refreshStats() {
         entryCountLabel.setText(String.valueOf(store.getEntries().size()));
@@ -69,9 +74,7 @@ public class DashboardController {
         albumCountLabel.setText(String.valueOf(store.getAlbumTree().toFlatList().size()));
     }
 
-    // ─────────────────────────────────────────────
     // ON THIS DAY
-    // ─────────────────────────────────────────────
 
     private void refreshOnThisDay() {
         onThisDayEntries.getChildren().clear();
@@ -95,8 +98,15 @@ public class DashboardController {
 
     private HBox buildMemoryEntryCard(JournalEntry entry) {
         HBox card = new HBox(14);
-        card.setStyle("-fx-background-color: #1e1e1e; -fx-background-radius: 12; -fx-cursor: default;");
+        card.setStyle("-fx-background-color: #1e1e1e; -fx-background-radius: 12; -fx-cursor: hand;");
         card.setPadding(new Insets(16));
+        card.setOnMouseEntered(e ->
+                card.setStyle("-fx-background-color: #262626; -fx-background-radius: 12; -fx-cursor: hand;"));
+        card.setOnMouseExited(e ->
+                card.setStyle("-fx-background-color: #1e1e1e; -fx-background-radius: 12; -fx-cursor: hand;"));
+        card.setOnMouseClicked(e -> {
+            if (entryClickHandler != null) entryClickHandler.accept(entry);
+        });
 
         // Year badge
         VBox badge = new VBox();
@@ -157,9 +167,7 @@ public class DashboardController {
         return container;
     }
 
-    // ─────────────────────────────────────────────
     // RECENT ENTRIES
-    // ─────────────────────────────────────────────
 
     private void refreshRecentEntries() {
         recentEntriesContainer.getChildren().clear();
@@ -182,7 +190,14 @@ public class DashboardController {
         HBox row = new HBox(16);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(14));
-        row.setStyle("-fx-background-color: #1e1e1e; -fx-background-radius: 10; -fx-cursor: default;");
+        row.setStyle("-fx-background-color: #1e1e1e; -fx-background-radius: 10; -fx-cursor: hand;");
+        row.setOnMouseEntered(e ->
+                row.setStyle("-fx-background-color: #262626; -fx-background-radius: 10; -fx-cursor: hand;"));
+        row.setOnMouseExited(e ->
+                row.setStyle("-fx-background-color: #1e1e1e; -fx-background-radius: 10; -fx-cursor: hand;"));
+        row.setOnMouseClicked(e -> {
+            if (entryClickHandler != null) entryClickHandler.accept(entry);
+        });
 
         VBox text = new VBox(4);
         HBox.setHgrow(text, Priority.ALWAYS);

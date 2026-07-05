@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.FlowPane?>
@@ -52,13 +51,21 @@
                                           -fx-border-radius: 8; -fx-background-radius: 8;
                                           -fx-padding: 8 12;"/>
                         <Text styleClass="muted-text" text="From"/>
-                        <DatePicker fx:id="fromDatePicker"
-                                    style="-fx-background-color: #1e1e1e; -fx-text-fill: white;"
-                                    prefWidth="150.0"/>
+                        <TextField fx:id="fromDateField"
+                                   promptText="YYYY-MM-DD"
+                                   prefWidth="130.0"
+                                   style="-fx-background-color: #1e1e1e; -fx-text-fill: white;
+                                          -fx-prompt-text-fill: #555; -fx-border-color: #333;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 8 12;"/>
                         <Text styleClass="muted-text" text="To"/>
-                        <DatePicker fx:id="toDatePicker"
-                                    style="-fx-background-color: #1e1e1e; -fx-text-fill: white;"
-                                    prefWidth="150.0"/>
+                        <TextField fx:id="toDateField"
+                                   promptText="YYYY-MM-DD"
+                                   prefWidth="130.0"
+                                   style="-fx-background-color: #1e1e1e; -fx-text-fill: white;
+                                          -fx-prompt-text-fill: #555; -fx-border-color: #333;
+                                          -fx-border-radius: 8; -fx-background-radius: 8;
+                                          -fx-padding: 8 12;"/>
                         <Button fx:id="filterButton" mnemonicParsing="false"
                                 styleClass="primary-button"
                                 stylesheets="@../stylesheets/buttons.css"

@@ -42,9 +42,7 @@ public class SettingsController {
         photoCountLabel.setText(store.getPhotos().size() + " photos");
     }
 
-    // ─────────────────────────────────────────────
     // EXPORT
-    // ─────────────────────────────────────────────
 
     private void handleExport() {
         DirectoryChooser chooser = new DirectoryChooser();
@@ -112,9 +110,7 @@ public class SettingsController {
         }
     }
 
-    // ─────────────────────────────────────────────
     // CLEAR ALL DATA
-    // ─────────────────────────────────────────────
 
     private void handleClearData() {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
@@ -160,9 +156,7 @@ public class SettingsController {
         showInfo("Data Cleared", "All entries, photos, and albums have been deleted.");
     }
 
-    // ─────────────────────────────────────────────
-    // HELPERS
-    // ─────────────────────────────────────────────
+    // Functions Pop-up (For changes)
 
     private void showInfo(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

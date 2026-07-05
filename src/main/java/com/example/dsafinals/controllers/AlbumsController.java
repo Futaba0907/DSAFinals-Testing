@@ -60,10 +60,7 @@ public class AlbumsController {
                 (obs, oldVal, newVal) -> onAlbumSelected(newVal)
         );
     }
-
-    // ─────────────────────────────────────────────
-    // ALBUM TREE
-    // ─────────────────────────────────────────────
+    // Album Tree
 
     private void refreshAlbumTree() {
         TreeItem<String> root = new TreeItem<>("Albums");
@@ -82,7 +79,6 @@ public class AlbumsController {
         TreeItem<String> item = new TreeItem<>("📁  " + node.album.getName());
         item.setExpanded(true);
         // Store album ID in the item's user data via a tag approach
-        // We'll use a custom cell to track the album
         for (AlbumTree.AlbumNode child : node.children) {
             item.getChildren().add(buildTreeItem(child));
         }
@@ -109,7 +105,7 @@ public class AlbumsController {
     private void onAlbumSelected(TreeItem<String> item) {
         if (item == null || item.getValue() == null) return;
 
-        // Extract album name (strip the folder emoji prefix)
+        // Extract album name
         String rawName = item.getValue().replace("📁  ", "").trim();
 
         // Find matching album in the store
@@ -130,9 +126,8 @@ public class AlbumsController {
         return null;
     }
 
-    // ─────────────────────────────────────────────
-    // NEW / DELETE ALBUM
-    // ─────────────────────────────────────────────
+    // NEW/DELETE Album
+
 
     private void handleNewAlbum() {
         TextInputDialog dialog = new TextInputDialog();
@@ -175,9 +170,7 @@ public class AlbumsController {
         });
     }
 
-    // ─────────────────────────────────────────────
     // PHOTO GRID
-    // ─────────────────────────────────────────────
 
     private void refreshPhotoGrid() {
         photoGrid.getChildren().clear();
@@ -268,7 +261,7 @@ public class AlbumsController {
 
         card.getChildren().addAll(imageView, nameLabel, dateLabel);
 
-        // Click → open detail dialog
+        // Click open detail dialog
         card.setOnMouseClicked(e -> openPhotoDetail(photo));
 
         // Hover effect
@@ -280,9 +273,7 @@ public class AlbumsController {
         return card;
     }
 
-    // ─────────────────────────────────────────────
     // IMPORT PHOTO
-    // ─────────────────────────────────────────────
 
     private void handleImportPhoto() {
         if (selectedAlbum == null) return;
@@ -309,9 +300,9 @@ public class AlbumsController {
         refreshPhotoGrid();
     }
 
-    // ─────────────────────────────────────────────
-    // PHOTO DETAIL DIALOG
-    // ─────────────────────────────────────────────
+
+    // PHOTO DETAILS
+
 
     private void openPhotoDetail(Photo photo) {
         Dialog<ButtonType> dialog = new Dialog<>();
@@ -390,9 +381,8 @@ public class AlbumsController {
         });
     }
 
-    // ─────────────────────────────────────────────
-    // HELPERS
-    // ─────────────────────────────────────────────
+
+    // Functions for styling
 
     private String truncate(String text, int maxLen) {
         return text.length() > maxLen ? text.substring(0, maxLen - 1) + "…" : text;

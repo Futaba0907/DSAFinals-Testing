@@ -81,6 +81,11 @@
 .scroll-pane {
     -fx-background-insets: 0;
     -fx-padding: 0;
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
 }
 
 /* Style the empty corner square when both scrollbars are active */
@@ -127,4 +132,33 @@
 .scroll-pane .scroll-bar .decrement-arrow {
     -fx-shape: " "; /* Empties out the default arrow graphics */
     -fx-padding: 0;
+}
+
+/* Tree view (used by the Albums panel) - kill the default white inner background */
+.tree-view {
+    -fx-background-color: -sidebar-color;
+    -fx-control-inner-background: -sidebar-color;
+    -fx-control-inner-background-alt: -sidebar-color;
+    -fx-border-color: transparent;
+}
+
+.tree-view .tree-cell {
+    -fx-background-color: -sidebar-color;
+}
+
+.tree-view .tree-cell:empty {
+    -fx-background-color: -sidebar-color;
+}
+
+.tree-view .tree-cell:selected {
+    -fx-background-color: -primary-color;
+}
+
+.tree-view .tree-cell:hover:filled {
+    -fx-background-color: #262626;
+}
+
+/* Remove the default arrow-toggle white square background */
+.tree-view .tree-cell .tree-disclosure-node .arrow {
+    -fx-background-color: white;
 }
