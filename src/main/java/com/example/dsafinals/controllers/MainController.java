@@ -7,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import org.kordamp.ikonli.javafx.FontIcon;
+import com.example.dsafinals.controllers.JournalController;
 
 import java.io.IOException;
 import java.net.URL;
@@ -61,9 +62,15 @@ public class MainController {
 
         // Change the view when a button is pressed
         bindSidebarButton(dashboardButton, "dashboard.fxml");
+        newEntryButton.setOnAction(e -> {
+            selectButton(journalButton);
+            JournalController controller = (JournalController) loadPageAndGetController("journal.fxml");
+            if (controller != null) controller.openEditor(null);
+        });
         bindSidebarButton(journalButton, "journal.fxml");
         bindSidebarButton(albumsButton, "albums.fxml");
         bindSidebarButton(photosButton, "photos.fxml");
+        bindSidebarButton(settingsButton, "settings.fxml");
 
         // Resize the sidebar based on the window width
         sidebar.sceneProperty().addListener((obs, oldScene, newScene) -> {
@@ -71,6 +78,20 @@ public class MainController {
                 sidebar.prefWidthProperty().bind(newScene.widthProperty().multiply(0.17));
             }
         });
+        loadPage("dashboard.fxml");
+    }
+
+    private Object loadPageAndGetController(String fxml) {
+        try {
+            URL url = getClass().getResource("/com/example/dsafinals/fxml/" + fxml);
+            FXMLLoader loader = new FXMLLoader(url);
+            Parent page = loader.load();
+            contentArea.getChildren().setAll(page);
+            return loader.getController();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void loadPage(String fxml) {

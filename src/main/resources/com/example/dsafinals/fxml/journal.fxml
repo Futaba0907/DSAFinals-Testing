@@ -1,10 +1,226 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Circle?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.dsafinals.controllers.DashboardController">
+<!-- Root: StackPane holds list + editor views; only one is visible at a time -->
+<StackPane fx:id="journalRoot"
+           stylesheets="@../stylesheets/application.css"
+           xmlns="http://javafx.com/javafx/26"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.example.dsafinals.controllers.JournalController">
     <children>
-      <Circle fill="DODGERBLUE" layoutX="100.0" layoutY="100.0" radius="100.0" stroke="BLACK" strokeType="INSIDE" />
+
+        <ScrollPane fx:id="listScrollPane"
+                    fitToWidth="true" fitToHeight="true" focusTraversable="false"
+                    style="-fx-background-color: -bg-color; -fx-background: -bg-color;">
+            <content>
+                <VBox style="-fx-background-color: -bg-color; -fx-padding: 30;" spacing="16.0">
+                    <children>
+
+                        <!-- Header row -->
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <children>
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                                              styleClass="title-text" text="Journal">
+                                            <font><Font size="36.0"/></font>
+                                        </Text>
+                                        <Text styleClass="muted-text"
+                                              text="Your private entries"/>
+                                    </children>
+                                </VBox>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <!-- Sort -->
+                                <ComboBox fx:id="sortComboBox" prefWidth="180.0"/>
+                                <!-- New Entry -->
+                                <Button fx:id="newEntryButton"
+                                        mnemonicParsing="false"
+                                        styleClass="primary-button"
+                                        stylesheets="@../stylesheets/buttons.css"
+                                        text="+  New Entry">
+                                    <font><Font size="14.0"/></font>
+                                    <padding>
+                                        <Insets bottom="10.0" left="17.0" right="17.0" top="10.0"/>
+                                    </padding>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <!-- Search bar -->
+                        <HBox spacing="8.0">
+                            <children>
+                                <TextField fx:id="searchField"
+                                           promptText="Search entries…"
+                                           HBox.hgrow="ALWAYS"
+                                           style="-fx-background-color: #1e1e1e;
+                                                  -fx-text-fill: white;
+                                                  -fx-prompt-text-fill: #555;
+                                                  -fx-border-color: #333;
+                                                  -fx-border-radius: 8;
+                                                  -fx-background-radius: 8;
+                                                  -fx-padding: 8 12;"/>
+                            </children>
+                        </HBox>
+
+                        <!-- Entry cards injected here -->
+                        <VBox fx:id="entryListContainer" spacing="12.0"/>
+
+                        <!-- Empty state -->
+                        <StackPane fx:id="emptyState" managed="false" visible="false"
+                                   prefHeight="200.0">
+                            <children>
+                                <VBox alignment="CENTER" spacing="10.0">
+                                    <children>
+                                        <Text styleClass="muted-text"
+                                              text="No journal entries yet."
+                                              style="-fx-font-size: 16px;"/>
+                                        <Text styleClass="muted-text"
+                                              text="Click &quot;+  New Entry&quot; to write your first one."/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </StackPane>
+
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+
+        <!-- ══════════════════════════════════════
+             EDITOR VIEW
+             ══════════════════════════════════════ -->
+        <ScrollPane fx:id="editorScrollPane"
+                    fitToWidth="true" fitToHeight="true" focusTraversable="false"
+                    managed="false" visible="false"
+                    style="-fx-background-color: -bg-color;">
+            <content>
+                <VBox spacing="18.0"
+                      style="-fx-background-color: -bg-color; -fx-padding: 30;"
+                      maxWidth="860.0">
+                    <children>
+
+                        <!-- Top bar: Back / Delete / Save -->
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <children>
+                                <Button fx:id="backButton" mnemonicParsing="false"
+                                        styleClass="transparent-button"
+                                        stylesheets="@../stylesheets/buttons.css"
+                                        text="← Back" textFill="WHITE"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="deleteButton" mnemonicParsing="false"
+                                        styleClass="transparent-button"
+                                        stylesheets="@../stylesheets/buttons.css"
+                                        text="Delete"
+                                        style="-fx-text-fill: #ef4444; -fx-background-color: transparent;"/>
+                                <Button fx:id="saveButton" mnemonicParsing="false"
+                                        styleClass="primary-button"
+                                        stylesheets="@../stylesheets/buttons.css"
+                                        text="Save">
+                                    <padding>
+                                        <Insets bottom="10.0" left="17.0" right="17.0" top="10.0"/>
+                                    </padding>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <!-- Title -->
+                        <TextField fx:id="titleField"
+                                   promptText="Entry title…"
+                                   style="-fx-font-size: 26px;
+                                          -fx-font-weight: bold;
+                                          -fx-background-color: transparent;
+                                          -fx-text-fill: white;
+                                          -fx-prompt-text-fill: #444;
+                                          -fx-border-width: 0 0 1 0;
+                                          -fx-border-color: #333;
+                                          -fx-padding: 6 0;"/>
+
+                        <!-- Date -->
+                        <HBox alignment="CENTER_LEFT" spacing="14.0">
+                            <children>
+                                <Text styleClass="muted-text" text="Date"/>
+                                <DatePicker fx:id="datePicker"
+                                            style="-fx-background-color: #1e1e1e; -fx-text-fill: white;"
+                                            prefWidth="180.0"/>
+                            </children>
+                        </HBox>
+
+                        <!-- Tags -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <Text styleClass="muted-text" text="Tags"/>
+                                <HBox spacing="8.0">
+                                    <children>
+                                        <TextField fx:id="tagInputField"
+                                                   promptText="Type a tag and press Enter…"
+                                                   HBox.hgrow="ALWAYS"
+                                                   style="-fx-background-color: #1e1e1e;
+                                                          -fx-text-fill: white;
+                                                          -fx-prompt-text-fill: #555;
+                                                          -fx-border-color: #333;
+                                                          -fx-border-radius: 6;
+                                                          -fx-background-radius: 6;"/>
+                                    </children>
+                                </HBox>
+                                <FlowPane fx:id="tagsFlowPane" hgap="8.0" vgap="6.0"/>
+                            </children>
+                        </VBox>
+
+                        <!-- Content -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <Text styleClass="muted-text" text="Entry"/>
+                                <TextArea fx:id="contentArea"
+                                          promptText="Write your thoughts…"
+                                          wrapText="true"
+                                          prefHeight="320.0"
+                                          style="-fx-control-inner-background: #1e1e1e;
+                                                 -fx-text-fill: white;
+                                                 -fx-prompt-text-fill: #555;
+                                                 -fx-border-color: #333;
+                                                 -fx-border-radius: 8;
+                                                 -fx-background-radius: 8;
+                                                 -fx-font-size: 14px;"/>
+                            </children>
+                        </VBox>
+
+                        <!-- Photos -->
+                        <VBox spacing="8.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <Text styleClass="muted-text" text="Photos"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button fx:id="addPhotoButton"
+                                                mnemonicParsing="false"
+                                                styleClass="sidebar-button"
+                                                stylesheets="@../stylesheets/buttons.css"
+                                                text="+ Attach Photo"
+                                                textFill="WHITE"/>
+                                    </children>
+                                </HBox>
+                                <FlowPane fx:id="photosFlowPane" hgap="10.0" vgap="10.0"/>
+                            </children>
+                        </VBox>
+
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+
     </children>
-</AnchorPane>
+</StackPane>

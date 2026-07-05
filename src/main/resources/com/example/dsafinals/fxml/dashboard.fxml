@@ -1,48 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" focusTraversable="false" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" pannable="true" prefHeight="400.0" style="-fx-background-color: -bg-color;" stylesheets="@../stylesheets/application.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+<ScrollPane fx:id="scrollPane" fitToWidth="true" focusTraversable="false" pannable="true"
+            style="-fx-background-color: -bg-color; -fx-background: -bg-color;"
+            stylesheets="@../stylesheets/application.css"
+            xmlns="http://javafx.com/javafx/26"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.dsafinals.controllers.DashboardController">
     <content>
-        <VBox maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="200.0" style="-fx-background-color: -bg-color; -fx-padding: 30;" stylesheets="@../stylesheets/application.css">
-         <children>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title-text" text="Dashboard">
-               <font>
-                  <Font size="36.0" />
-               </font>
-            </Text>
-            <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="muted-text" text="Tuesday, June 23, 2026">
-               <VBox.margin>
-                  <Insets bottom="20.0" />
-               </VBox.margin></Text>
-            <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-               <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0" styleClass="card">
-                     <children>
-                        <StackPane prefWidth="200.0" />
-                        <VBox prefWidth="100.0" />
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0" styleClass="card">
-                     <children>
-                        <StackPane prefWidth="200.0" />
-                        <VBox prefWidth="100.0" />
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0" styleClass="card">
-                     <children>
-                        <StackPane prefWidth="200.0" />
-                        <VBox prefWidth="100.0" />
-                     </children>
-                  </HBox>
-               </children>
-            </HBox>
-         </children></VBox>
+        <VBox style="-fx-background-color: -bg-color; -fx-padding: 30;" spacing="28.0">
+            <children>
+
+                <!-- Page header -->
+                <VBox spacing="4.0">
+                    <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0"
+                              styleClass="title-text" text="Dashboard">
+                            <font><Font size="36.0"/></font>
+                        </Text>
+                        <Text fx:id="todayLabel" styleClass="muted-text"
+                              text="Your memories at a glance"/>
+                    </children>
+                </VBox>
+
+                <!-- ── STATS CARDS ─────────────────────── -->
+                <HBox spacing="14.0">
+                    <children>
+
+                        <!-- Entries card -->
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: #1e1e1e; -fx-background-radius: 14; -fx-padding: 20;">
+                            <children>
+                                <Text styleClass="muted-text" text="Journal Entries"/>
+                                <Label fx:id="entryCountLabel"
+                                       style="-fx-text-fill: #155dfc; -fx-font-size: 38px; -fx-font-weight: bold;"
+                                       text="0"/>
+                                <Text styleClass="muted-text" text="total entries written"/>
+                            </children>
+                        </VBox>
+
+                        <!-- Photos card -->
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: #1e1e1e; -fx-background-radius: 14; -fx-padding: 20;">
+                            <children>
+                                <Text styleClass="muted-text" text="Photos"/>
+                                <Label fx:id="photoCountLabel"
+                                       style="-fx-text-fill: #2ecc71; -fx-font-size: 38px; -fx-font-weight: bold;"
+                                       text="0"/>
+                                <Text styleClass="muted-text" text="photos imported"/>
+                            </children>
+                        </VBox>
+
+                        <!-- Albums card -->
+                        <VBox spacing="6.0" HBox.hgrow="ALWAYS"
+                              style="-fx-background-color: #1e1e1e; -fx-background-radius: 14; -fx-padding: 20;">
+                            <children>
+                                <Text styleClass="muted-text" text="Albums"/>
+                                <Label fx:id="albumCountLabel"
+                                       style="-fx-text-fill: #f59e0b; -fx-font-size: 38px; -fx-font-weight: bold;"
+                                       text="0"/>
+                                <Text styleClass="muted-text" text="albums created"/>
+                            </children>
+                        </VBox>
+
+                    </children>
+                </HBox>
+
+                <!-- ── ON THIS DAY ─────────────────────── -->
+                <VBox fx:id="onThisDaySection" spacing="14.0">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <Text styleClass="text"
+                                      style="-fx-font-size: 20px; -fx-font-weight: bold;"
+                                      text="🗓  On This Day"/>
+                                <Text styleClass="muted-text"
+                                      text="Memories from previous years"/>
+                            </children>
+                        </HBox>
+
+                        <!-- Empty state -->
+                        <Text fx:id="onThisDayEmptyText" styleClass="muted-text"
+                              text="No memories from this day in previous years yet. Keep journaling!"/>
+
+                        <!-- Past journal entries -->
+                        <VBox fx:id="onThisDayEntries" spacing="10.0"/>
+
+                        <!-- Past photos -->
+                        <FlowPane fx:id="onThisDayPhotos" hgap="10.0" vgap="10.0"/>
+                    </children>
+                </VBox>
+
+                <!-- ── RECENT ENTRIES ──────────────────── -->
+                <VBox spacing="14.0">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <Text styleClass="text"
+                                      style="-fx-font-size: 20px; -fx-font-weight: bold;"
+                                      text="📝  Recent Entries"/>
+                                <Text styleClass="muted-text" text="Your last 5 journal entries"/>
+                            </children>
+                        </HBox>
+
+                        <Text fx:id="recentEntriesEmpty" styleClass="muted-text"
+                              managed="false" visible="false"
+                              text="No journal entries yet. Head to the Journal page to start writing."/>
+
+                        <VBox fx:id="recentEntriesContainer" spacing="8.0"/>
+                    </children>
+                </VBox>
+
+            </children>
+        </VBox>
     </content>
 </ScrollPane>
