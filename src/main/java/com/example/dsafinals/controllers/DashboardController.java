@@ -6,6 +6,9 @@ import com.example.dsafinals.storage.DataStore;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
@@ -218,7 +221,32 @@ public class DashboardController {
         Label date = new Label(entry.getDate() != null ? entry.getDate().format(DATE_FMT) : "");
         date.setStyle("-fx-text-fill: #555; -fx-font-size: 11px;");
 
-        row.getChildren().addAll(text, date);
+        Button deleteBtn = new Button("✕");
+        deleteBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #93a1a1; " +
+                            "-fx-font-size: 13px; -fx-cursor: hand;");
+        deleteBtn.setOnMouseEntered(e -> deleteBtn.setStyle(
+                "-fx-background-color: transparent; -fx-text-fill: #ff5c5c; -fx-font-size: 13px; -fx-cursor: hand;"));
+        deleteBtn.setOnMouseExited(e -> deleteBtn.setStyle(
+                "-fx-background-color: transparent; -fx-text-fill: #93a1a1; -fx-font-size: 13px; -fx-cursor: hand;"));
+        deleteBtn.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, javafx.scene.input.MouseEvent::consume);
+        deleteBtn.setOnAction(e -> confirmAndDelete(entry));
+
+        row.getChildren().addAll(text, date, deleteBtn);
         return row;
+    }
+
+    private void confirmAndDelete(JournalEntry entry) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Delete Entry");
+        confirm.setHeaderText("Delete \"" +
+                ((entry.getTitle() == null || entry.getTitle().isBlank()) ? "Untitled" : entry.getTitle()) + "\"?");
+        confirm.setContentText("This action cannot be undone.");
+
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                store.deleteEntry(entry.getId());
+                refresh(); // re-render dashboard so the row disappears
+            }
+        });
     }
 }
