@@ -1,13 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TreeView?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:controller="com.example.dsafinals.controllers.AlbumsController"
-            xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
-            style="-fx-background-color: -bg-color;" stylesheets="@../stylesheets/application.css">
-    <children>
-        <TreeView fx:id="albumTree" AnchorPane.topAnchor="20.0" AnchorPane.leftAnchor="20.0"
-                  AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0"/>
-    </children>
-</AnchorPane>
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+      style="-fx-background-color: #0a0a0a;"
+      xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.dsafinals.controllers.AlbumsController">
+
+    <!-- LEFT PANEL: Album Tree -->
+    <VBox minWidth="220.0" prefWidth="240.0" maxWidth="240.0"
+          style="-fx-background-color: #171717; -fx-border-width: 0 1 0 0; -fx-border-color: #262626;">
+        <padding><Insets top="20" left="15" right="15" bottom="15"/></padding>
+
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT" spacing="8">
+            <Text text="Albums" fill="WHITE">
+                <font><Font name="System Bold" size="18"/></font>
+            </Text>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="newAlbumButton" text="+" styleClass="primary-button"
+                    stylesheets="@../stylesheets/buttons.css"
+                    mnemonicParsing="false">
+                <padding><Insets top="4" bottom="4" left="10" right="10"/></padding>
+            </Button>
+        </HBox>
+
+        <Region prefHeight="12"/>
+
+        <!-- Album Tree -->
+        <TreeView fx:id="albumTreeView" VBox.vgrow="ALWAYS"
+                  style="-fx-background-color: #171717; -fx-border-color: transparent;"/>
+
+        <Region prefHeight="10"/>
+
+        <!-- Delete Album -->
+        <Button fx:id="deleteAlbumButton" text="Delete Album"
+                maxWidth="1.7976931348623157E308"
+                styleClass="sidebar-button"
+                stylesheets="@../stylesheets/buttons.css"
+                mnemonicParsing="false" textFill="#ef4444"/>
+    </VBox>
+
+    <!-- RIGHT PANEL: Photo Grid -->
+    <VBox HBox.hgrow="ALWAYS" maxHeight="1.7976931348623157E308">
+        <padding><Insets top="20" left="20" right="20" bottom="20"/></padding>
+
+        <!-- Top bar -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <VBox>
+                <Text fx:id="albumNameText" text="Select an album" fill="WHITE">
+                    <font><Font name="System Bold" size="22"/></font>
+                </Text>
+                <Text fx:id="photoCountText" text="" fill="#93a1a1">
+                    <font><Font size="13"/></font>
+                </Text>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Sort -->
+            <ComboBox fx:id="sortComboBox" prefWidth="160"
+                      style="-fx-background-color: #262626; -fx-text-fill: white;"/>
+
+            <!-- Import button -->
+            <Button fx:id="importPhotoButton" text="+ Import Photo"
+                    styleClass="primary-button"
+                    stylesheets="@../stylesheets/buttons.css"
+                    mnemonicParsing="false">
+                <padding><Insets top="8" bottom="8" left="14" right="14"/></padding>
+            </Button>
+        </HBox>
+
+        <Region prefHeight="16"/>
+
+        <!-- Photo grid inside scroll pane -->
+        <ScrollPane VBox.vgrow="ALWAYS" fitToWidth="true"
+                    style="-fx-background-color: #0a0a0a;"
+                    stylesheets="@../stylesheets/application.css">
+            <content>
+                <FlowPane fx:id="photoGrid" hgap="12" vgap="12"
+                          style="-fx-background-color: #0a0a0a;">
+                    <padding><Insets top="4" bottom="4"/></padding>
+                </FlowPane>
+            </content>
+        </ScrollPane>
+
+        <!-- Empty state -->
+        <StackPane fx:id="emptyState" VBox.vgrow="ALWAYS" visible="false" managed="false">
+            <VBox alignment="CENTER" spacing="8">
+                <Text text="No photos yet" fill="#93a1a1">
+                    <font><Font size="16"/></font>
+                </Text>
+                <Text text="Click '+ Import Photo' to add images to this album" fill="#4a4a4a">
+                    <font><Font size="13"/></font>
+                </Text>
+            </VBox>
+        </StackPane>
+
+    </VBox>
+</HBox>
