@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:controller="com.example.dsafinals.controllers.NewEntryController"
+      xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      spacing="10.0" style="-fx-background-color: -bg-color; -fx-padding: 20;"
+      stylesheets="@../stylesheets/application.css" prefWidth="400.0">
+    <children>
+        <Label text="Title" styleClass="muted-text"/>
+        <TextField fx:id="titleField"/>
+        <Label text="Content" styleClass="muted-text"/>
+        <TextArea fx:id="contentArea" prefHeight="150.0" wrapText="true"/>
+        <Label text="Tags (comma separated)" styleClass="muted-text"/>
+        <TextField fx:id="tagsField"/>
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+            <children>
+                <Button text="Cancel" onAction="#handleCancel" styleClass="primary-button" stylesheets="@../stylesheets/buttons.css"/>
+                <Button text="Save" styleClass="primary-button" stylesheets="@../stylesheets/buttons.css" onAction="#handleSave"/>
+            </children>
+            <VBox.margin>
+                <Insets top="10.0"/>
+            </VBox.margin>
+        </HBox>
+    </children>
+</VBox>

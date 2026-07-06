@@ -20,6 +20,7 @@
 
 .muted-text {
     -fx-fill: #93a1a1;
+    -fx-text-fill: #93a1a1;
 }
 
 .card {
@@ -81,11 +82,6 @@
 .scroll-pane {
     -fx-background-insets: 0;
     -fx-padding: 0;
-    -fx-background-color: transparent;
-}
-
-.scroll-pane > .viewport {
-    -fx-background-color: transparent;
 }
 
 /* Style the empty corner square when both scrollbars are active */
@@ -134,31 +130,82 @@
     -fx-padding: 0;
 }
 
-/* Tree view (used by the Albums panel) - kill the default white inner background */
+.text-field {
+    -fx-background-color: -sidebar-color;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #6b6b6b;
+    -fx-background-radius: 8px;
+    -fx-border-color: #262626;
+    -fx-border-radius: 8px;
+    -fx-padding: 8px 12px;
+}
+
+.text-area {
+    -fx-background-color: -sidebar-color;
+    -fx-background-radius: 8px;
+    -fx-border-color: #262626;
+    -fx-text-fill: white;
+}
+
+.text-area .content {
+    -fx-background-color: -sidebar-color;
+    -fx-background-radius: 8px;
+}
+
+.toolbar-button {
+    -fx-background-color: #262626;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-background-radius: 8px;
+    -fx-padding: 8px 14px;
+}
+
+.toolbar-button:hover {
+    -fx-background-color: #333333;
+}
+
+.list-view {
+    -fx-background-color: -sidebar-color;
+    -fx-background-radius: 12px;
+    -fx-background-insets: 0;
+    -fx-padding: 4px;
+}
+
+.list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-padding: 10px 14px;
+}
+
+.list-view .list-cell:filled:hover {
+    -fx-background-color: #262626;
+    -fx-background-radius: 8px;
+}
+
+.list-view .list-cell:filled:selected {
+    -fx-background-color: -primary-color;
+    -fx-background-radius: 8px;
+}
+
 .tree-view {
     -fx-background-color: -sidebar-color;
-    -fx-control-inner-background: -sidebar-color;
-    -fx-control-inner-background-alt: -sidebar-color;
-    -fx-border-color: transparent;
+    -fx-background-radius: 12px;
+    -fx-padding: 4px;
 }
 
 .tree-view .tree-cell {
-    -fx-background-color: -sidebar-color;
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
 }
 
-.tree-view .tree-cell:empty {
-    -fx-background-color: -sidebar-color;
-}
-
-.tree-view .tree-cell:selected {
-    -fx-background-color: -primary-color;
-}
-
-.tree-view .tree-cell:hover:filled {
+.tree-view .tree-cell:filled:hover {
     -fx-background-color: #262626;
 }
 
-/* Remove the default arrow-toggle white square background */
+.tree-view .tree-cell:filled:selected {
+    -fx-background-color: -primary-color;
+}
+
 .tree-view .tree-cell .tree-disclosure-node .arrow {
-    -fx-background-color: white;
+    -fx-background-color: #93a1a1;
 }
