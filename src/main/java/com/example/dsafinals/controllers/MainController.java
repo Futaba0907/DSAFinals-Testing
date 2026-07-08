@@ -1,5 +1,6 @@
 package com.example.dsafinals.controllers;
 
+import com.example.dsafinals.storage.DataStore;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -45,6 +46,11 @@ public class MainController {
 
     private Button selectedButton;
 
+    private final DataStore store = DataStore.getInstance();
+
+    /** Tracks the fxml file currently shown in contentArea, so undo/redo can refresh it. */
+    private String currentFxml = "dashboard.fxml";
+
     @FXML
     public void initialize() {
         selectedButton = dashboardButton;
@@ -59,6 +65,22 @@ public class MainController {
 
         undoButton.setGraphic(createIcon("mdi2u-undo", "topbar-icon-disabled"));
         redoButton.setGraphic(createIcon("mdi2r-redo", "topbar-icon-disabled"));
+
+        // Undo / Redo actions
+        undoButton.setOnAction(e -> {
+            store.undo();
+            refreshCurrentPage();
+        });
+        redoButton.setOnAction(e -> {
+            store.redo();
+            refreshCurrentPage();
+        });
+
+        // Keep the undo/redo buttons live: fires instantly whenever ANY page
+        // (Journal, Photos, Albums, etc.) adds/edits/deletes something, or
+        // when undo/redo itself runs — no need to wait for navigation.
+        store.addStackChangeListener(this::refreshUndoRedoButtons);
+        refreshUndoRedoButtons();
 
         // Change the view when a button is pressed
         dashboardButton.setOnAction(e -> {
@@ -103,6 +125,8 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(url);
             Parent page = loader.load();
             contentArea.getChildren().setAll(page);
+            currentFxml = fxml;
+            refreshUndoRedoButtons();
             return loader.getController();
         } catch (IOException e) {
             e.printStackTrace();
@@ -118,10 +142,33 @@ public class MainController {
             Parent page = FXMLLoader.load(url);
 
             contentArea.getChildren().setAll(page);
+            currentFxml = fxml;
+            refreshUndoRedoButtons();
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /** Reload whichever page is currently showing, so undo/redo changes are reflected. */
+    private void refreshCurrentPage() {
+        if ("dashboard.fxml".equals(currentFxml)) {
+            openDashboard();
+        } else {
+            loadPageAndGetController(currentFxml);
+        }
+    }
+
+    /** Enable/disable the undo/redo buttons and swap their icon color based on stack state. */
+    private void refreshUndoRedoButtons() {
+        boolean canUndo = store.canUndo();
+        boolean canRedo = store.canRedo();
+
+        undoButton.setDisable(!canUndo);
+        undoButton.setGraphic(createIcon("mdi2u-undo", canUndo ? "topbar-icon-available" : "topbar-icon-disabled"));
+
+        redoButton.setDisable(!canRedo);
+        redoButton.setGraphic(createIcon("mdi2r-redo", canRedo ? "topbar-icon-available" : "topbar-icon-disabled"));
     }
 
     public FontIcon createIcon(String iconCode) {

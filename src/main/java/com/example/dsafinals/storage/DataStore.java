@@ -32,6 +32,9 @@ public class DataStore {
     // ── File storage ──────────────────────────────────────────────
     private final StorageManager storage;
 
+    // ── Listeners (notified whenever the undo/redo stacks change) ──
+    private final List<Runnable> stackChangeListeners = new ArrayList<>();
+
     // ── Singleton ─────────────────────────────────────────────────
     private static DataStore instance;
 
@@ -204,9 +207,25 @@ public class DataStore {
     // UNDO / REDO
     // ─────────────────────────────────────────────
 
+    /**
+     * Register a callback to be run whenever the undo/redo stacks change
+     * (an action is recorded, undone, or redone). Lets the UI stay in sync
+     * with stack state without needing to poll or reload on navigation.
+     */
+    public void addStackChangeListener(Runnable listener) {
+        stackChangeListeners.add(listener);
+    }
+
+    private void notifyStackChanged() {
+        for (Runnable listener : new ArrayList<>(stackChangeListeners)) {
+            listener.run();
+        }
+    }
+
     private void pushUndo(UndoAction action) {
         undoStack.push(action);
         redoStack.clear();
+        notifyStackChanged();
     }
 
     public boolean canUndo() { return !undoStack.isEmpty(); }
@@ -218,6 +237,7 @@ public class DataStore {
         applyUndo(action);
         redoStack.push(action);
         saveAll();
+        notifyStackChanged();
     }
 
     public void redo() {
@@ -226,6 +246,7 @@ public class DataStore {
         applyRedo(action);
         undoStack.push(action);
         saveAll();
+        notifyStackChanged();
     }
 
     private void applyUndo(UndoAction action) {
